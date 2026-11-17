@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Lab Duties ISBM</title>
 <meta name="theme-color" content="#2a64d6">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -36,6 +36,9 @@ html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   padding-bottom:calc(64px + var(--safe-b))}
 button,input,select{font:inherit;color:inherit}
+/* 16px or more stops iPhones from zooming in when a field is tapped */
+input,select,textarea{font-size:16px!important}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button{cursor:pointer}
 .pad{padding-left:max(14px,var(--safe-l));padding-right:max(14px,var(--safe-r))}
 .page{max-width:860px;margin:0 auto}
