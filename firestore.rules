@@ -1,0 +1,33 @@
+rules_version = '2';
+// Lab Duties ISBM – who may read and write the checklist.
+// Paste this into Firebase → Firestore Database → Rules, put YOUR Google email
+// (the lab manager) in place of the example below, then click Publish.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function myEmail() {
+      return request.auth.token.email.lower();
+    }
+    // Lab manager(s): may add and remove members. Use lowercase.
+    function isAdmin() {
+      return signedIn() && myEmail() in ['your.name@gmail.com'];
+    }
+    function isMember() {
+      return isAdmin() || (signedIn() && exists(/databases/$(database)/documents/members/$(myEmail())));
+    }
+
+    // Member list: one document per email address (lowercase).
+    match /members/{email} {
+      allow read: if isMember() || (signedIn() && email == myEmail());
+      allow write: if isAdmin();
+    }
+
+    // The checklist data
+    match /labs/{lab}/{document=**} {
+      allow read, write: if isMember();
+    }
+  }
+}

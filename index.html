@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lab Duties ISBM</title>
+<meta name="theme-color" content="#2a64d6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lab Duties">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#f3f5f9; --card:#ffffff; --ink:#1b2230; --muted:#5a6477; --line:#dde2ea;
+  --accent:#2a64d6; --accent-soft:#e6eeff; --ok:#1d8148; --ok-soft:#dff3e7;
+  --bad:#c0392f; --bad-soft:#fbe4e2; --na:#6f7a8f; --na-soft:#eceff4;
+  --yellow:#fff5c4; --weekend:#fff1dc; --warn:#9a6200;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#111419; --card:#1a1e27; --ink:#e6e9ef; --muted:#9aa3b4; --line:#2c3240;
+    --accent:#6e9dff; --accent-soft:#1f2f4d; --ok:#4cc27e; --ok-soft:#163121;
+    --bad:#ff7d73; --bad-soft:#3b1d1b; --na:#a3aab8; --na-soft:#252a34;
+    --yellow:#38331a; --weekend:#33281a; --warn:#f0b54a;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding-bottom:calc(64px + var(--safe-b))}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.pad{padding-left:max(14px,var(--safe-l));padding-right:max(14px,var(--safe-r))}
+.page{max-width:860px;margin:0 auto}
+
+/* top bar */
+header{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line);padding-top:var(--safe-t)}
+.bar1{display:flex;align-items:center;gap:10px;padding-block:10px 6px}
+.bar1 h1{font-size:18px;margin:0;font-weight:650;flex:1;min-width:0}
+.sync{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--na);flex:none}
+.sync.ok i{background:var(--ok)} .sync.busy i{background:var(--accent)} .sync.warn i{background:var(--warn)}
+.iconbtn{border:1px solid var(--line);background:var(--card);border-radius:10px;width:40px;height:40px;display:grid;place-items:center;flex:none}
+.iconbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.datebar{display:flex;gap:6px;align-items:center;padding-block:4px 10px}
+.datebar select{border:1px solid var(--line);background:var(--card);border-radius:10px;height:40px;padding:0 8px;min-width:0}
+#selMonth{flex:1.4} #selDay{flex:1.6} #selYear{flex:.9}
+.daypill{font-size:13px;color:var(--muted);padding-bottom:8px}
+.daypill b{color:var(--ink)}
+.daypill.weekend b{color:var(--warn)}
+
+/* bottom nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);
+  display:flex;padding-bottom:var(--safe-b);padding-left:var(--safe-l);padding-right:var(--safe-r)}
+nav.tabs button{flex:1;border:0;background:none;padding:8px 2px 9px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+nav.tabs svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button[aria-selected=true]{color:var(--accent);font-weight:600}
+
+main{padding-block:14px 24px}
+section.tab{display:none} section.tab.active{display:block}
+.banner{border:1px solid var(--warn);background:var(--weekend);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:13px}
+.banner button{margin-top:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h2{font-size:17px;margin:0 0 4px}
+.note{color:var(--muted);font-size:13px;margin:4px 0 0}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.fields label,.lbl{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.mlist{list-style:none;padding:0;margin:8px 0 0;max-height:40vh;overflow:auto}
+.mlist li{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.mlist li .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.mlist .x{font-size:14px}
+input[type=text],input[type=url],input[type=email]{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 10px;min-height:42px;width:100%;min-width:0}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input:disabled{opacity:.6}
+.progress{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.meter{flex:1;height:8px;background:var(--na-soft);border-radius:4px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--ok);width:0;transition:width .2s}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 12px;min-height:42px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+
+/* grouped lists */
+.group{margin:18px 2px 8px;font-size:13px;font-weight:650;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;display:flex;justify-content:space-between}
+.group span{color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0}
+.item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px}
+.item.bad{border-color:var(--bad);background:var(--bad-soft)}
+.item.done{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.ihead{display:flex;gap:10px;align-items:flex-start}
+.inum{flex:none;width:26px;height:26px;border-radius:50%;background:var(--na-soft);color:var(--muted);font-size:12px;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.ititle{font-weight:600;min-width:0;flex:1}
+.ititle small{display:block;font-weight:400;color:var(--muted);font-size:13px;margin-top:2px}
+.chip{display:inline-block;font-size:11px;padding:1px 7px;border-radius:10px;background:var(--na-soft);color:var(--muted);margin-left:6px;font-weight:500;vertical-align:1px}
+.status{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.status button{border:1px solid var(--line);background:var(--card);border-radius:10px;min-height:44px;font-weight:650;font-size:16px}
+.status button[data-v="✓"][aria-pressed=true]{background:var(--ok);border-color:var(--ok);color:#fff}
+.status button[data-v="✗"][aria-pressed=true]{background:var(--bad);border-color:var(--bad);color:#fff}
+.status button[data-v="n.a."][aria-pressed=true]{background:var(--na);border-color:var(--na);color:#fff}
+.status button:disabled{opacity:.55}
+.extra{display:flex;gap:8px;margin-top:8px}
+.extra input{flex:1}
+.reading{max-width:120px}
+.by{font-size:12px;color:var(--muted);margin-top:6px}
+.linkbtn{border:0;background:none;color:var(--accent);padding:6px 0 0;font-size:13px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.yellow input{background:var(--yellow)}
+.seg{display:flex;gap:6px;margin-top:8px;align-items:center;font-size:13px;color:var(--muted)}
+.seg button{border:1px solid var(--line);background:var(--card);border-radius:10px;min-height:38px;padding:0 14px}
+.seg button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.checkrow{display:flex;gap:12px;align-items:flex-start}
+.cbox{flex:none;width:28px;height:28px;border-radius:8px;border:2px solid var(--line);background:var(--card);display:grid;place-items:center;padding:0}
+.cbox[aria-pressed=true]{background:var(--ok);border-color:var(--ok)}
+.cbox svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.cbox[aria-pressed=true] svg{opacity:1}
+.meta{font-size:12px;color:var(--muted);margin-top:2px}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.filters select{border:1px solid var(--line);background:var(--card);border-radius:10px;min-height:42px;padding:0 8px;min-width:0}
+.filters .full{grid-column:1/-1}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.empty{color:var(--muted);font-style:italic;padding:8px 2px}
+.x{border:0;background:none;color:var(--muted);font-size:20px;line-height:1;padding:0 4px}
+table.sched{width:100%;border-collapse:collapse;margin-top:8px}
+table.sched td,table.sched th{padding:9px 6px;border-bottom:1px solid var(--line);text-align:left}
+table.sched th{font-size:12px;color:var(--muted);font-weight:600}
+table.sched tr.current td{background:var(--accent-soft)}
+table.sched tr:last-child td{border-bottom:0}
+dialog{border:0;border-radius:16px;padding:0;width:min(520px,calc(100vw - 24px));background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg{padding:18px;display:flex;flex-direction:column;gap:12px}
+.dlg h2{margin:0;font-size:18px}
+.signin{max-width:420px;margin:12vh auto 0;text-align:center}
+.signin img{width:72px;height:72px;border-radius:18px}
+@media (min-width:700px){
+  nav.tabs{justify-content:center}
+  nav.tabs button{flex:0 1 120px}
+}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="page pad">
+    <div class="bar1">
+      <h1>Lab Duties</h1>
+      <div class="sync" id="sync"><i></i><span id="syncText">Starting…</span></div>
+      <button class="iconbtn" id="btnSettings" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    </div>
+    <div class="datebar">
+      <button class="iconbtn" id="prevDay" aria-label="Previous day"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <select id="selMonth" aria-label="Month"></select>
+      <select id="selDay" aria-label="Day"></select>
+      <select id="selYear" aria-label="Year"></select>
+      <button class="iconbtn" id="nextDay" aria-label="Next day"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+    </div>
+    <div class="daypill" id="dayPill"></div>
+  </div>
+</header>
+
+<main class="page pad" id="app">
+  <div class="banner" id="banner" hidden></div>
+
+  <section class="tab active" id="tab-daily">
+    <div class="card">
+      <h2>Daily Lab Duty Check</h2>
+      <p class="note">End-of-day round, daily at 17:30 (proposed). ✓ = OK, ✗ = problem (fix or log in 'Issue Log'), n.a. Rows marked “reading” → type the displayed value.</p>
+      <div class="fields">
+        <label>Week of<input type="text" id="weekOf" readonly></label>
+        <label>Duty person<input type="text" id="dutyPerson" placeholder="Name"></label>
+      </div>
+      <div class="progress"><span id="dailyCount"></span><div class="meter"><i id="dailyBar"></i></div></div>
+      <div class="btnrow">
+        <button class="btn" id="allOk">Mark rest as ✓</button>
+        <button class="btn" id="clearDay">Clear day</button>
+        <button class="btn" id="exportCsv">Export CSV</button>
+      </div>
+    </div>
+    <div id="dailyList"></div>
+    <div class="card" style="margin-top:14px">
+      <label class="lbl">Signature duty person (end of week)<input type="text" id="signature" placeholder="Name / initials"></label>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-restock">
+    <div class="card">
+      <h2>Consumables restock</h2>
+      <p class="note">Room 020 (and shared). Yellow fields = set once by lab manager. Min = reorder/refill trigger; Fill to = target stock at workplace.</p>
+      <div class="progress"><span id="restockCount"></span><div class="meter"><i id="restockBar"></i></div></div>
+    </div>
+    <div id="restockList"></div>
+  </section>
+
+  <section class="tab" id="tab-weekly">
+    <div class="card">
+      <h2>Weekly routine</h2>
+      <p class="note">Checked off per week (<span id="weeklyLabel"></span>). Rooms without tasks in the spreadsheet are still empty. Add tasks below each room.</p>
+    </div>
+    <div id="weeklyList"></div>
+  </section>
+
+  <section class="tab" id="tab-inventory">
+    <div class="card">
+      <h2>Inventory to check</h2>
+      <p class="note">Saved per month (<span id="invLabel"></span>). Tick once the item has been counted.</p>
+      <div class="progress"><span id="invCount"></span><div class="meter"><i id="invBar"></i></div></div>
+    </div>
+    <div class="filters">
+      <select id="invLoc" aria-label="Location"><option value="">All locations</option></select>
+      <label class="toggle"><input type="checkbox" id="invUnchecked"> only unchecked</label>
+      <input type="text" id="invSearch" class="full" placeholder="Search item, article nr., company…" aria-label="Search">
+    </div>
+    <div id="invList"></div>
+  </section>
+
+  <section class="tab" id="tab-material">
+    <div class="card">
+      <h2>Material to produce</h2>
+      <p class="note">Saved per month (<span id="matLabel"></span>). Tick when made and note amount / date / who.</p>
+    </div>
+    <div id="matList"></div>
+  </section>
+
+  <section class="tab" id="tab-schedule">
+    <div class="card">
+      <h2>Monthly lab duty</h2>
+      <table class="sched" id="schedMonth"><thead><tr><th>Month</th><th>Responsible person</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="card">
+      <h2>Hood – duties</h2>
+      <p class="note">Note in spreadsheet: “kann man noch ändern”.</p>
+      <table class="sched" id="schedHood"><thead><tr><th>Hood</th><th>Responsible person</th></tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="daily" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Daily</button>
+  <button data-tab="restock" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>Restock</button>
+  <button data-tab="weekly" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Weekly</button>
+  <button data-tab="inventory" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Inventory</button>
+  <button data-tab="material" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4 19a1.5 1.5 0 0 0 1.3 2h13.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10"/></svg>Produce</button>
+  <button data-tab="schedule" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2A5 5 0 0 1 21 19"/></svg>Who</button>
+</nav>
+
+<dialog id="settings">
+  <form method="dialog" class="dlg" id="settingsForm">
+    <h2>Settings</h2>
+    <div id="acctInfo" class="note"></div>
+    <div class="btnrow" style="margin-top:0">
+      <button type="button" class="btn primary" id="btnSignIn" hidden>Sign in with Google</button>
+      <button type="button" class="btn" id="btnSignOut" hidden>Sign out</button>
+    </div>
+    <div id="membersBox" hidden>
+      <h2 style="font-size:16px">Lab members</h2>
+      <p class="note" style="margin:0">Only people on this list can open the checklist. Only the lab manager can change the list.</p>
+      <ul class="mlist" id="memberList"></ul>
+      <div class="extra"><input type="email" id="memberEmail" placeholder="name@gmail.com" aria-label="Email to add" autocomplete="off"><button type="button" class="btn" id="btnAddMember">Add</button></div>
+      <p class="note" id="memberMsg" style="margin:6px 0 0"></p>
+    </div>
+    <div class="btnrow" style="margin-top:0">
+      <button type="submit" class="btn">Close</button>
+    </div>
+    <p class="note" id="appVersion" style="margin:0"></p>
+  </form>
+</dialog>
+
+<script src="config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+"use strict";
+const APP_VERSION = "1.0";
+/* ================= Content of Lab_Duties_ISBM.xlsx ================= */
+const SCHEDULE = [
+  {m:10, label:"November 2026", person:"Mattea"},
+  {m:11, label:"December 2026", person:"Julian"},
+  {m:0,  label:"January",       person:"Xiya"},
+  {m:1,  label:"February",      person:""}
+];
+const HOODS = [["HEK culture left hood","Steffi"],["HEK culture right hood","Xiya"],["011 hood","Mattea"],["ipsc hood","Julian"],["t-cell hood","(Niklas)"]];
+const DAILY = [
+  {g:"Main Lab 003"},
+  [1,"Equipment","Fridges & freezers","All doors fully closed and sealed; display normal; no alarm light/beep"],
+  [2,"Equipment","Water bath","Switched off – unless labeled 'overnight use' with name + date"],
+  [3,"Reagents","Enzymes, oligos, maxipreps","None left out – back in assigned freezer/fridge box"],
+  [4,"Reagents","Kits","Returned to labeled storage location"],
+  [5,"Bench","Bench cleared","Meets end-of-day bench standard (Standards S1): no trash, samples, kits, used tubes"],
+  [6,"Bench","Bench wiped","Wiped 1× water, 1× 70 % EtOH by user (Standards S2); duty checks"],
+  [7,"Bench","Pipettes","All hung on stand, set to max volume"],
+  [8,"Waste","Bench bins / biohazard / sharps","< ¾ full; full sharps container closed and labeled"],
+  {g:"Cold / Temp rooms"},
+  [9,"Equipment","37 °C room [reading]","36–38 °C; door closed; light off"],
+  [10,"Equipment","4 °C cold room [reading]","2–8 °C; door closed; light off"],
+  [11,"Equipment","-80 °C freezer [reading]","≤ -70 °C; no alarm; door closed"],
+  {g:"Gel room 001"},
+  [12,"Equipment","Blue-light transilluminator / gel doc","Switched off"],
+  [13,"Equipment","Thermocyclers","No run left holding at 4 °C overnight; samples removed; lid closed"],
+  [14,"Bench","Gels","No gels left in tanks or on bench; disposed in gel waste"],
+  [15,"Bench","Erlenmeyer flasks (agarose)","No gel residue; rinsed; upside down to dry"],
+  [16,"Waste","Gel waste / trash","Emptied if > ¾ full"],
+  {g:"Room 010"},
+  [17,"Equipment","HCS Studio","Software closed, user logged off, instrument in standby per SOP"],
+  [18,"Equipment","Maxi column regeneration","Columns cleaned per protocol and placed in drying rack (Standards S5)"],
+  [19,"Bench","Bench cleared & wiped","Same standard as Main Lab (S1, S2)"],
+  {g:"Room 020 019 011 – Cell culture"},
+  [20,"Hood","Biosafety cabinet","Interior empty except permanent items; wiped 70 % EtOH; sash closed (Standards S3)"],
+  [21,"Hood","Hood waste","Waste bag removed and replaced"],
+  [22,"Hood","Aspiration pump","Tubing flushed (bleach → water); pump off; waste flask < ¾ full with bleach"],
+  [23,"Equipment","Metal bead bath","Empty – no medium, tubes or bottles"],
+  [24,"Reagents","Media & solutions","No antibiotics, Accutase, medium, PBS, maxi dilutions left out"],
+  [25,"Equipment","Microscope","Lamp off, laser/fluorescence off, dust cover on"],
+  [26,"Equipment","Incubator(s) [reading]","37 °C, 5 % CO₂, water pan filled, no alarm"],
+  [27,"Equipment","CO₂ supply [reading]","Cylinder pressure above change level; spare available"],
+  [28,"Bench","Surfaces & centrifuge","Nothing stored on centrifuge or bench back: UC tubes, filters, tip boxes, syringes returned"],
+  [29,"Bench","Sticky mat","Top sheet replaced"],
+  [30,"Restock","Consumables","Restocked to target level – see 'Restock' tab"]
+];
+const ROOM_OF = {}; { let g=""; DAILY.forEach(r=>{ if(r.g) g=r.g; else ROOM_OF[r[0]]=g; }); }
+const RESTOCK = ["Serological pipettes 5 ml","Serological pipettes 10 ml","Serological pipettes 25 ml","Filter tips 10 µl","Filter tips 200 µl","Filter tips 1000 µl","Cell plates 96-well","Cell plates 48-well","Cell plates 24-well","Cell plates 12-well","Cell plates 6-well","Culture dishes 10cm and 15cm","1.5 ml tubes","15 ml Falcon","50 ml Falcon","Reservoirs","70% Ethanol"];
+const WEEKLY = [
+  {room:"Main lab", tasks:[]},
+  {room:"Cold room", tasks:[]},
+  {room:"Gel room??", tasks:[]},
+  {room:"010", tasks:[]},
+  {room:"020", tasks:["Clean the hood, also the part down the metal, and check the prefilters are still clean, without any tips stuck on them and not too much dust","Clean the dust around the hood"]}
+];
+const LOCATIONS = ["Cell culture / Cabinet outside 020","cold room","Jeffs room 010","main lab","Storage Room","R 001"];
+const INVENTORY = [
+  ["UC-Tubes","3117-0380","Thermo Fischer","Cell culture / Cabinet outside 020","","4 boxes (4x10)"],
+  ["Amicon 4 100kDa concentrator","UFC910096","Merck","Cell culture / Cabinet outside 020","","4 Boxes 4x24"],
+  ["Amicon 15 100kDa concentrator","UFC910024","Merck","Cell culture / Cabinet outside 020","","2 Boxes"],
+  ["steril filter (Luer) 0.22µm","SLGV033RB","Merck","Cell culture / Cabinet outside 020","","At least 20 Units"],
+  ["steril filter (Luer) 0.45µm","SLHV033RB","Merck","Cell culture / Cabinet outside 020","","At least 50 units"],
+  ["argar dishes 5cm","","","Jeffs room 010","",""],
+  ["50 ml pipettes","","","Jeffs room 010","","3 Boxes"],
+  ["25 ml pipettes","","","Jeffs room 010","","3 Boxes"],
+  ["10 ml pipettes","","","Jeffs room 010","","3 Boxes"],
+  ["5 ml pipettes","","","Jeffs room 010","","3 Boxes"],
+  ["96-well plates (black bottom)","","","Jeffs room 010","","2 Packs"],
+  ["1000µl Filtertips","5001419","Lager","main lab","","3 Boxes"],
+  ["200µl Filtertips","5001418","Lager","main lab","","3 Boxes"],
+  ["10/20 µl Filtertips","5001415","Lager","main lab","","3 Boxes"],
+  ["1000µl Tips without Filter (nonsteril)","F167203","Gilson","main lab","","1 Tower"],
+  ["200µl Tips without Filter (nonsteril)","F167104","Gilson","main lab","","1 Tower"],
+  ["10/20 µl Tips without Filter (nonsteril)","F167101","Gilson","main lab","","1 Tower"],
+  ["Integra Tips 1000µl","3705","Integra/ Ariba BANF","main lab","",""],
+  ["Integra Tips 200µl","","","main lab","",""],
+  ["Integra Tips 10/20µl","3745","Integra/ Ariba BANF","main lab","",""],
+  ["Zewa","","","main lab","",""],
+  ["Epis (1,5 ml)","5000638","Eppendorf","main lab","","1 Box"],
+  ["Epis (2 ml)","5000634","Eppendorf","main lab","","1 Box"],
+  ["cell spreaders","PC58.1","Carl Roth","main lab","",""],
+  ["pcr tubes","","","main lab","",""],
+  ["FACS plates","","","main lab","",""],
+  ["Carb antibiotics 50mg/ml (in 50% Ethanol)","","","main lab","",""],
+  ["kanamycin stock 50mg/ml","","","main lab","",""],
+  ["agar plates with Carbenicillin","","","main lab","",""],
+  ["agar plates with Kanamycin","","","main lab","",""],
+  ["DPBS, (-)Mg2+, (-)Ca2+","14190169","Gibco","main lab","","At least 10???"],
+  ["DMEM Advance","12491023","Gibco","main lab","","At least 10???"],
+  ["microsynth tubes","","","main lab","",""],
+  ["Combi tips 0.5ml","","","main lab","",""],
+  ["Combi tips 10 ml","","","main lab","",""],
+  ["Combi tips 2.5ml","","","main lab","",""],
+  ["Combi tips 5 ml","VB-0250","Eppendorf","main lab","",""],
+  ["Barcode Microsynth E coli Night seq","","","main lab","",""],
+  ["Barcode Microsynth Economy run","","","main lab","",""],
+  ["Barcode Microsynth Nanopore","","","main lab","",""],
+  ["Barcode Genewitz Sanger","","","main lab","",""],
+  ["Barcode Genewitz Nanopore","","","main lab","",""],
+  ["Barcode Genewitz Amplicon EZ","","","main lab","",""],
+  ["gDNA kit Zymo Tube","D3021","","main lab","",""],
+  ["gDNA kit Zymo 96w plate","D3012","","main lab","",""],
+  ["PCR Strips","","","main lab","",""],
+  ["PCR plates","","","main lab","",""],
+  ["PCR foils","APT8.1","Carl Roth","main lab","","1x100"],
+  ["96 Well storage foils","1210232","NeoLab","main lab","","1x100"],
+  ["Syringe 50 ml","","","R 001","",""],
+  ["Syringe 20 ml","","","R 001","",""],
+  ["Syringe 2 ml","","","R 001","",""],
+  ["Kanual Sterical 120mm","","","R 001","6 boxes","2 boxes"],
+  ["50 ml Falcons","5000743","Lager","Storage Room","","","Comment in spreadsheet: Check only primary storage or also secondary? If only primary, then it is in Lager. Cell culture is more to fill up than inventory check? I wrote it in daily routine. But in the end I'm fine with the version everyone agrees on."],
+  ["15 ml Falcons","5000741","Lager","Storage Room","",""],
+  ["T25","","","Storage Room","",""],
+  ["T75","5000803","","Storage Room","",""],
+  ["T225","159934","","Storage Room","",""],
+  ["96-well plates (CC)","165305","","Storage Room","",""],
+  ["48-well plates","","","Storage Room","",""],
+  ["24-Well plates","","","Storage Room","",""],
+  ["12-Well plates","353043","","Storage Room","",""],
+  ["6-well plates","353046","","Storage Room","",""],
+  ["10 cm dishes (CC)","150464","","Storage Room","",""],
+  ["15 cm dishes (CC)","15803947","","Storage Room","",""],
+  ["Reservoirs","10320551","","Storage Room","",""]
+];
+const MATERIAL = ["Agar plate with Carb","Agar plate with Kanamycin","Maxi P1 buffer","Maxi P2 buffer","Maxi P3 buffer","Maxi QBT buffer","Maxi QF Buffer","Maxi QC buffer","Maxi EB buffer","Carbinicillin 50mg/ml","Kanamycin 50mg/ml","Competent E. coli","SuperFi","Steril 20% sucrose","FCS value aliquote 50 ml","FCS premium heat inactivated aliquote 50ml","Steril H2O Aliquote 50ml","Penicillin/streptomycin 5ml Aliquote"];
+
+/* ================= Helpers ================= */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const WD = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const WDL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const pad = n => String(n).padStart(2,"0");
+const clone = o => JSON.parse(JSON.stringify(o ?? {}));
+const getIn = (o,f) => f.split(".").reduce((x,k)=> (x && typeof x==="object") ? x[k] : undefined, o);
+function nest(f,v){ const ks=f.split("."), out={}; let o=out; ks.forEach((k,i)=>{ if(i===ks.length-1) o[k]=v; else o=o[k]={}; }); return out; }
+function merge(t,s){ for(const k in s){ const v=s[k]; if(v && typeof v==="object" && !Array.isArray(v)){ if(!t[k]||typeof t[k]!=="object"||Array.isArray(t[k])) t[k]={}; merge(t[k],v); } else t[k]=v; } return t; }
+const lsGet = (k,d) => { try { const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); } catch(e){ return d; } };
+const lsSet = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
+const CHECK_SVG = '<svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>';
+
+/* ================= Storage: Firebase (Firestore) or demo ================= */
+const CFG = window.LAB_CONFIG || {};
+const FBC = CFG.firebase || {};
+const LAB = CFG.lab || "isbm";
+const HAS_FB = !!(FBC.projectId && FBC.apiKey);
+let mode = "demo";            // "demo" | "firebase"
+let fdb = null, auth = null, fbUser = null;
+let myName = lsGet("lab-myname", "");
+const cache = HAS_FB ? {} : lsGet("lab-demo", {});   // doc id -> data
+
+function setSync(cls, text){ $("sync").className="sync "+cls; $("syncText").textContent=text; }
+function banner(html){ const b=$("banner"); b.innerHTML=html||""; b.hidden=!html; }
+function view(file){ return clone(cache[file]); }
+const docRef = file => fdb.collection("labs").doc(LAB).collection("docs").doc(file);
+
+function patch(file, p){
+  if (!canWrite) return;
+  merge(cache[file] ||= {}, clone(p));
+  scheduleRender();
+  if (mode!=="firebase"){ lsSet("lab-demo", cache); return; }
+  // merge-write: only the changed fields are sent, so people ticking different items never overwrite each other
+  docRef(file).set(p, {merge:true}).catch(onWriteError);
+}
+function onWriteError(e){
+  if (e && e.code==="permission-denied") notMember();
+  else setSync("warn","Not saved – check your connection");
+}
+const subs = {};
+function watch(slot, file){
+  if (mode!=="firebase" || !fbUser) return;
+  if (subs[slot] && subs[slot].file===file) return;
+  if (subs[slot]) subs[slot].off();
+  const off = docRef(file).onSnapshot({includeMetadataChanges:true}, snap => {
+    cache[file] = snap.exists ? clone(snap.data()) : {};
+    const m = snap.metadata;
+    if (m.hasPendingWrites) setSync("busy", navigator.onLine ? "Saving…" : "Offline – saved on this device");
+    else if (m.fromCache) setSync("warn", navigator.onLine ? "Connecting…" : "Offline – saved on this device");
+    else setSync("ok","Live · synced");
+    scheduleRender();
+  }, err => { if (err.code==="permission-denied") notMember(); else setSync("warn","Can’t reach the database"); });
+  subs[slot] = {file, off};
+}
+function unwatchAll(){ Object.keys(subs).forEach(k=>{ subs[k].off(); delete subs[k]; }); }
+function resubscribe(){ watch("settings",F.settings); watch("day",F.day()); watch("week",F.week()); watch("month",F.month()); }
+
+/* ================= Date selection ================= */
+const selY=$("selYear"), selM=$("selMonth"), selD=$("selDay");
+const today = new Date();
+for (let y=today.getFullYear()-1; y<=today.getFullYear()+2; y++) selY.add(new Option(y,y));
+MONTHS.forEach((m,i)=> selM.add(new Option(innerWidth<480 ? m.slice(0,3) : m, i)));
+function fillDays(keep){
+  const y=+selY.value, m=+selM.value, n=new Date(y,m+1,0).getDate();
+  selD.innerHTML="";
+  for (let d=1; d<=n; d++){ const wd=new Date(y,m,d).getDay(); selD.add(new Option(`${d} · ${WD[wd]}${wd===0||wd===6?" (weekend)":""}`, d)); }
+  selD.value = Math.min(keep||1, n);
+}
+const cur = () => new Date(+selY.value, +selM.value, +selD.value);
+const dkey = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function monday(d){ const x=new Date(d); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; }
+const fmt = d => `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+const F = {
+  day:   () => "day-"   + dkey(cur()),
+  week:  () => "week-"  + dkey(monday(cur())),
+  month: () => "month-" + `${selY.value}-${pad(+selM.value+1)}`,
+  settings: "settings"
+};
+function setDate(dt){ if (+selY.value!==dt.getFullYear() && ![...selY.options].some(o=>+o.value===dt.getFullYear())) selY.add(new Option(dt.getFullYear(),dt.getFullYear())); selY.value=dt.getFullYear(); selM.value=dt.getMonth(); fillDays(dt.getDate()); dateChanged(); }
+function dateChanged(){ disarm(); render(); resubscribe(); }
+selY.onchange = selM.onchange = ()=>{ fillDays(+selD.value); dateChanged(); };
+selD.onchange = dateChanged;
+$("prevDay").onclick = ()=>{ const d=cur(); d.setDate(d.getDate()-1); setDate(d); };
+$("nextDay").onclick = ()=>{ const d=cur(); d.setDate(d.getDate()+1); setDate(d); };
+$("dayPill").addEventListener("click", ()=> setDate(new Date()));
+const scheduledPerson = m => (SCHEDULE.find(s=>s.m===m)||{}).person || "";
+
+/* ================= Rendering ================= */
+let canWrite = true;
+const dis = () => canWrite ? "" : " disabled";
+const byKey = f => f.replace(/\./g,"_");
+function byLine(V, f){ const who=getIn(V,"by."+byKey(f)); return who && getIn(V,f) ? `<div class="by">by ${esc(who)}</div>` : ""; }
+function statusBtns(file, f, v){
+  return `<div class="status">${["✓","✗","n.a."].map(x=>`<button data-file="${file}" data-f="${f}" data-v="${x}" aria-pressed="${v===x}"${dis()}>${x}</button>`).join("")}</div>`;
+}
+const txt = (file, f, v, ph="", cls="") => `<input type="text" class="${cls}" data-file="${file}" data-f="${f}" value="${esc(v ?? "")}" placeholder="${esc(ph)}"${dis()}>`;
+const cbox = (file, f, on, label) => `<button class="cbox" data-file="${file}" data-f="${f}" data-toggle="1" aria-pressed="${!!on}" aria-label="${esc(label)}"${dis()}>${CHECK_SVG}</button>`;
+function meter(c,b,done,total,word){ $(c).textContent=`${done} / ${total} ${word}`; $(b).style.width=(total?done/total*100:0)+"%"; }
+const openCmt = new Set();
+
+let renderQueued=false, renderDeferred=false;
+function editing(){ const a=document.activeElement; return !!(a && a.tagName==="INPUT" && a.dataset && (a.dataset.file || a.dataset.addfor!==undefined)); }
+function scheduleRender(){ if (renderQueued) return; renderQueued=true; requestAnimationFrame(()=>{ renderQueued=false; render(); }); }
+document.addEventListener("focusout", ()=> setTimeout(()=>{ if (renderDeferred && !editing()){ renderDeferred=false; render(); } }, 50));
+
+function render(){
+  if (editing()){ renderDeferred=true; return; }   // never redraw under someone's keyboard
+  const d=cur(), wd=d.getDay(), day=F.day(), week=F.week(), month=F.month(), set=F.settings;
+  const D=view(day), W=view(week), M=view(month), S=view(set);
+  const isToday = dkey(d)===dkey(new Date());
+  $("dayPill").innerHTML = `<b>${WDL[wd]}, ${fmt(d)}</b>${isToday?" · today":" · tap to jump to today"}`;
+  $("dayPill").classList.toggle("weekend", wd===0||wd===6);
+
+  // Daily
+  let h="", done=0;
+  DAILY.forEach(r=>{
+    if (r.g){ const items=DAILY.filter(x=>!x.g && ROOM_OF[x[0]]===r.g); const n=items.filter(x=>getIn(D,"daily."+x[0])).length;
+      h+=`<div class="group">${esc(r.g)}<span>${n}/${items.length}</span></div>`; return; }
+    const [n,cat,item,std]=r, v=getIn(D,"daily."+n)||"", isRead=item.includes("[reading]"), c=getIn(D,"cmt."+n)||"";
+    if (v) done++;
+    const showC = c || openCmt.has(day+n);
+    h+=`<div class="item ${v==="✗"?"bad":v?"done":""}">
+      <div class="ihead"><div class="inum">${n}</div><div class="ititle">${esc(item.replace(" [reading]",""))}${isRead?'<span class="chip">reading</span>':""}<span class="chip">${esc(cat)}</span><small>${esc(std)}</small></div></div>
+      ${statusBtns(day,"daily."+n,v)}
+      ${isRead?`<div class="extra">${txt(day,"read."+n,getIn(D,"read."+n),"Reading value","reading")}</div>`:""}
+      ${showC?`<div class="extra">${txt(day,"cmt."+n,c,"Comment")}</div>`:`<button class="linkbtn" data-cmt="${n}">+ Add comment</button>`}
+      ${byLine(D,"daily."+n)}</div>`;
+  });
+  $("dailyList").innerHTML = h;
+  meter("dailyCount","dailyBar",done,30,"checked");
+  $("weekOf").value = fmt(monday(d));
+  const dp=$("dutyPerson"), sg=$("signature");
+  dp.dataset.file=week; dp.dataset.f="duty"; dp.value = getIn(W,"duty") ?? scheduledPerson(d.getMonth()); dp.disabled=!canWrite;
+  sg.dataset.file=week; sg.dataset.f="sig";  sg.value = getIn(W,"sig") ?? ""; sg.disabled=!canWrite;
+
+  // Restock
+  let rd=0;
+  $("restockList").innerHTML = RESTOCK.map((it,i)=>{
+    const v=getIn(D,"restock."+i)||"", o=getIn(D,"order."+i)||""; if (v) rd++;
+    return `<div class="item ${v==="✗"?"bad":v?"done":""}"><div class="ititle">${esc(it)}</div>
+      <div class="row3 yellow">
+        <label class="lbl">Location${txt(set,`restock.${i}.loc`,getIn(S,`restock.${i}.loc`))}</label>
+        <label class="lbl">Min level${txt(set,`restock.${i}.min`,getIn(S,`restock.${i}.min`))}</label>
+        <label class="lbl">Fill to${txt(set,`restock.${i}.fill`,getIn(S,`restock.${i}.fill`))}</label>
+      </div>
+      ${statusBtns(day,"restock."+i,v)}
+      <div class="seg">Order needed?${["yes","no"].map(x=>`<button data-file="${day}" data-f="order.${i}" data-v="${x}" aria-pressed="${o===x}"${dis()}>${x}</button>`).join("")}</div>
+      ${byLine(D,"restock."+i)}</div>`;
+  }).join("");
+  meter("restockCount","restockBar",rd,RESTOCK.length,"checked today");
+
+  // Weekly
+  $("weeklyLabel").textContent = "week of "+fmt(monday(d));
+  $("weeklyList").innerHTML = WEEKLY.map((w,ri)=>{
+    const extra = getIn(S,"weeklyExtra."+ri) || [];
+    const items = [...w.tasks.map((t,ti)=>({t,k:`w${ri}_${ti}`})), ...extra.map(x=>({t:x.t,k:x.k,extra:true}))];
+    return `<div class="group">${esc(w.room)}</div>
+      ${items.map(it=>{ const f="weekly."+it.k; return `<div class="item"><div class="checkrow">${cbox(week,f,getIn(W,f),it.t)}<div class="ititle" style="font-weight:500">${esc(it.t)}${byLine(W,f)}</div>${it.extra&&canWrite?`<button class="x" data-del="${ri}" data-k="${it.k}" aria-label="Remove task">×</button>`:""}</div></div>`; }).join("") || `<div class="empty">No tasks listed yet.</div>`}
+      ${canWrite?`<div class="extra" style="margin-bottom:6px"><input type="text" placeholder="Add task for ${esc(w.room)}…" data-addfor="${ri}"><button class="btn" data-add="${ri}">Add</button></div>`:""}`;
+  }).join("");
+
+  // Inventory
+  $("invLabel").textContent = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  const loc=$("invLoc").value, q=$("invSearch").value.toLowerCase(), only=$("invUnchecked").checked;
+  let idone=0, lastLoc=null;
+  const inv = INVENTORY.map((r,i)=>{
+    const c=getIn(M,`inv.${i}.c`); if (c) idone++;
+    if (loc && r[3]!==loc) return "";
+    if (q && !r.slice(0,4).join(" ").toLowerCase().includes(q)) return "";
+    if (only && c) return "";
+    const head = r[3]!==lastLoc ? `<div class="group">${esc(r[3])}</div>` : ""; lastLoc=r[3];
+    const meta = [r[1]&&("Art. "+r[1]), r[2], r[5]&&("Target: "+r[5])].filter(Boolean).join(" · ");
+    return head+`<div class="item ${c?"done":""}"><div class="checkrow">${cbox(month,`inv.${i}.c`,c,"Checked "+r[0])}
+      <div class="ititle">${esc(r[0])}<div class="meta">${esc(meta)}</div>${r[6]?`<div class="meta" style="font-style:italic">${esc(r[6])}</div>`:""}${byLine(M,`inv.${i}.c`)}</div></div>
+      <div class="row2"><label class="lbl">Existing amount${txt(month,`inv.${i}.ex`,getIn(M,`inv.${i}.ex`) ?? r[4])}</label>
+      <label class="lbl">In order (amount, date)${txt(month,`inv.${i}.ord`,getIn(M,`inv.${i}.ord`))}</label></div></div>`;
+  }).join("");
+  $("invList").innerHTML = inv || `<div class="empty">No items match.</div>`;
+  meter("invCount","invBar",idone,INVENTORY.length,"checked this month");
+
+  // Material
+  $("matLabel").textContent = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  $("matList").innerHTML = MATERIAL.map((x,i)=>{ const c=getIn(M,`mat.${i}.c`);
+    return `<div class="item ${c?"done":""}"><div class="checkrow">${cbox(month,`mat.${i}.c`,c,"Done "+x)}<div class="ititle">${esc(x)}${byLine(M,`mat.${i}.c`)}</div></div>
+      <div class="extra">${txt(month,`mat.${i}.n`,getIn(M,`mat.${i}.n`),"Amount / date / by")}</div></div>`; }).join("");
+
+  // Schedule
+  $("schedMonth").tBodies[0].innerHTML = SCHEDULE.map(s=>`<tr class="${s.m===d.getMonth()?"current":""}"><td>${esc(s.label)}</td><td>${s.person?esc(s.person):'<span class="empty">not assigned</span>'}</td></tr>`).join("");
+  $("schedHood").tBodies[0].innerHTML = HOODS.map(h=>`<tr><td>${esc(h[0])}</td><td>${esc(h[1])}</td></tr>`).join("");
+
+  ["allOk","clearDay"].forEach(id=>$(id).disabled=!canWrite);
+}
+
+/* ================= Interaction ================= */
+const who = () => myName || (mode==="demo" ? "this device" : "");
+document.addEventListener("click", e=>{
+  const b = e.target.closest("button[data-file]");
+  if (b && !b.disabled){
+    const {file,f} = b.dataset, V=view(file);
+    let nv;
+    if (b.dataset.toggle) nv = !getIn(V,f);
+    else nv = getIn(V,f)===b.dataset.v ? "" : b.dataset.v;
+    const p = nest(f,nv);
+    if (!/^order\./.test(f)) merge(p, {by:{[byKey(f)]: nv ? who() : ""}});
+    patch(file,p);
+    if (navigator.vibrate && nv) try{ navigator.vibrate(8); }catch(_){}
+    return;
+  }
+  const c = e.target.closest("[data-cmt]");
+  if (c){ openCmt.add(F.day()+c.dataset.cmt); render(); const inp=document.querySelector(`input[data-f="cmt.${c.dataset.cmt}"]`); if(inp) inp.focus(); return; }
+  const add = e.target.closest("[data-add]"); if (add) addTask(+add.dataset.add);
+  const del = e.target.closest("[data-del]");
+  if (del){ const ri=+del.dataset.del; const list=(getIn(view(F.settings),"weeklyExtra."+ri)||[]).filter(x=>x.k!==del.dataset.k); patch(F.settings, nest("weeklyExtra."+ri, list)); }
+});
+const tTimers = {};
+document.addEventListener("input", e=>{
+  const t=e.target; if (!t.dataset || !t.dataset.file) return;
+  const {file,f}=t.dataset, k=file+"|"+f, v=t.value;
+  clearTimeout(tTimers[k]); tTimers[k]=setTimeout(()=>patch(file, nest(f,v)), 700);
+});
+document.addEventListener("change", e=>{    // save immediately when a field is left
+  const t=e.target; if (!t.dataset || !t.dataset.file || t.type!=="text") return;
+  const {file,f}=t.dataset, k=file+"|"+f; if (tTimers[k]){ clearTimeout(tTimers[k]); delete tTimers[k]; patch(file, nest(f,t.value)); }
+});
+function addTask(ri){
+  const inp=document.querySelector(`[data-addfor="${ri}"]`), v=inp && inp.value.trim(); if (!v) return;
+  inp.value=""; inp.blur();
+  const list=[...(getIn(view(F.settings),"weeklyExtra."+ri)||[]), {k:"x"+Date.now().toString(36), t:v}];
+  patch(F.settings, nest("weeklyExtra."+ri, list));
+}
+document.addEventListener("keydown", e=>{ if (e.key==="Enter" && e.target.dataset && e.target.dataset.addfor!==undefined){ e.preventDefault(); addTask(+e.target.dataset.addfor); } });
+
+$("allOk").onclick = ()=>{
+  const day=F.day(), D=view(day), p={daily:{},by:{}};
+  DAILY.forEach(r=>{ if(!r.g && !getIn(D,"daily."+r[0])){ p.daily[r[0]]="✓"; p.by["daily_"+r[0]]=who(); } });
+  if (Object.keys(p.daily).length) patch(day,p);
+};
+let armed=null;
+function disarm(){ armed=null; $("clearDay").textContent="Clear day"; $("clearDay").classList.remove("danger"); }
+$("clearDay").onclick = async ()=>{
+  const day=F.day();
+  if (armed!==day){ armed=day; $("clearDay").textContent="Tap again to clear"; $("clearDay").classList.add("danger"); setTimeout(()=>{ if(armed===day) disarm(); },4000); return; }
+  disarm();
+  // overwrite every value of this day with an empty one (works offline, merges like any other change)
+  const D=view(day), blank={};
+  (function walk(src,dst){ for(const k in src){ if(src[k]&&typeof src[k]==="object"&&!Array.isArray(src[k])) walk(src[k], dst[k]={}); else dst[k]=""; } })(D,blank);
+  openCmt.clear(); patch(day, blank);
+};
+$("exportCsv").onclick = ()=>{
+  const day=F.day(), D=view(day), S=view(F.settings), d=cur(), q=s=>`"${String(s??"").replace(/"/g,'""')}"`;
+  const rows=[["Date",dkey(d)],["Duty person",$("dutyPerson").value],[],["#","Room","Category","Check item","Pass standard","Status","Reading","Comment","By"]];
+  DAILY.forEach(r=>{ if(!r.g) rows.push([r[0],ROOM_OF[r[0]],r[1],r[2],r[3],getIn(D,"daily."+r[0])||"",getIn(D,"read."+r[0])||"",getIn(D,"cmt."+r[0])||"",getIn(D,"by.daily_"+r[0])||""]); });
+  rows.push([],["Restock item","Storage location","Min level","Fill to","Status","Order needed?"]);
+  RESTOCK.forEach((it,i)=>rows.push([it,getIn(S,`restock.${i}.loc`)||"",getIn(S,`restock.${i}.min`)||"",getIn(S,`restock.${i}.fill`)||"",getIn(D,"restock."+i)||"",getIn(D,"order."+i)||""]));
+  const blob=new Blob(["﻿"+rows.map(r=>r.map(q).join(";")).join("\r\n")],{type:"text/csv"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`lab-duty-${dkey(d)}.csv`; document.body.appendChild(a); a.click(); a.remove();
+};
+LOCATIONS.forEach(l=>$("invLoc").add(new Option(l,l)));
+$("invLoc").onchange = $("invUnchecked").onchange = render;
+$("invSearch").addEventListener("input", render);
+
+$("tabs").addEventListener("click", e=>{
+  const b=e.target.closest("button[data-tab]"); if(!b) return;
+  document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-selected", x===b));
+  document.querySelectorAll("section.tab").forEach(s=>s.classList.toggle("active", s.id==="tab-"+b.dataset.tab));
+  window.scrollTo({top:0}); lsSet("lab-tab", b.dataset.tab);
+});
+{ const t=lsGet("lab-tab",null); const b=t && document.querySelector(`#tabs [data-tab="${t}"]`); if (b) b.click(); }
+
+/* ================= Sign-in, members & settings ================= */
+const googleProvider = () => { const p=new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({prompt:"select_account"}); return p; };
+async function signIn(){
+  try { await auth.signInWithPopup(googleProvider()); }
+  catch(e){
+    if (["auth/popup-blocked","auth/operation-not-supported-in-this-environment","auth/cancelled-popup-request"].includes(e.code)) return auth.signInWithRedirect(googleProvider());
+    if (e.code!=="auth/popup-closed-by-user") banner("Sign-in didn’t work: "+esc(e.message));
+  }
+}
+function notMember(){
+  canWrite=false; unwatchAll();
+  banner(`You’re signed in as <b>${esc(fbUser && fbUser.email)}</b>, but this account isn’t on the lab list yet. Ask the lab manager to add this email under Settings → Lab members, then reopen the app.<br><button class="btn" id="bOut">Use another account</button>`);
+  $("bOut").onclick=()=>auth.signOut();
+  setSync("warn","No access yet"); render();
+}
+async function onUser(u){
+  fbUser=u; unwatchAll(); Object.keys(cache).forEach(k=>delete cache[k]);
+  if (!u){
+    canWrite=false;
+    banner(`Sign in with your Google account to see and tick the lab checklist.<br><button class="btn primary" id="bIn">Sign in with Google</button>`);
+    $("bIn").onclick=signIn; setSync("warn","Not signed in"); render(); return;
+  }
+  myName = u.displayName || u.email; lsSet("lab-myname", myName);
+  try { await docRef(F.settings).get(); }
+  catch(e){ if (e.code==="permission-denied"){ notMember(); return; } }   // offline errors: carry on with the saved copy
+  canWrite=true; banner(""); resubscribe(); render();
+}
+
+let membersOff=null;
+const memberMsg = t => { $("memberMsg").textContent=t||""; };
+function watchMembers(){
+  if (membersOff || !fbUser) return;
+  membersOff = fdb.collection("members").onSnapshot(s=>{
+    $("membersBox").hidden=false;
+    $("memberList").innerHTML = s.docs.map(d=>`<li><span class="t">${esc(d.id)}</span><button type="button" class="x" data-rmmember="${esc(d.id)}" aria-label="Remove ${esc(d.id)}">×</button></li>`).join("") || `<li class="empty">No members yet.</li>`;
+  }, ()=>{ $("membersBox").hidden=true; membersOff=null; });
+}
+function updateSettings(){
+  $("appVersion").textContent = "Version "+APP_VERSION+(mode==="demo"?" · demo mode":"");
+  $("btnSignIn").hidden = mode!=="firebase" || !!fbUser;
+  $("btnSignOut").hidden = !fbUser;
+  $("acctInfo").textContent = mode==="demo" ? "Demo mode: the database isn’t connected yet (see SETUP.md). Entries are saved on this device only."
+    : fbUser ? `Signed in as ${fbUser.displayName||""} (${fbUser.email}).` : "Not signed in.";
+  if (mode==="firebase" && fbUser) watchMembers(); else $("membersBox").hidden=true;
+}
+$("btnSettings").onclick = ()=>{ memberMsg(""); updateSettings(); $("settings").showModal(); };
+$("btnSignIn").onclick = ()=>{ $("settings").close(); signIn(); };
+$("btnSignOut").onclick = ()=>{ if (membersOff){ membersOff(); membersOff=null; } $("settings").close(); auth.signOut(); };
+$("btnAddMember").onclick = async ()=>{
+  const v=$("memberEmail").value.trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ memberMsg("Enter a valid email address."); return; }
+  try { await fdb.collection("members").doc(v).set({added: firebase.firestore.FieldValue.serverTimestamp()}); $("memberEmail").value=""; memberMsg(`Added ${v}. They can sign in now.`); }
+  catch(e){ memberMsg(e.code==="permission-denied" ? "Only the lab manager can add members." : "Couldn’t add: "+e.message); }
+};
+$("memberList").addEventListener("click", async e=>{
+  const b=e.target.closest("[data-rmmember]"); if (!b) return;
+  if (b.dataset.armed!=="1"){ b.dataset.armed="1"; b.textContent="remove?"; setTimeout(()=>{ b.dataset.armed=""; b.textContent="×"; },3000); return; }
+  try { await fdb.collection("members").doc(b.dataset.rmmember).delete(); }
+  catch(err){ memberMsg(err.code==="permission-denied" ? "Only the lab manager can remove members." : "Couldn’t remove: "+err.message); }
+});
+
+async function boot(){
+  selY.value=today.getFullYear(); selM.value=today.getMonth(); fillDays(today.getDate());
+  render();
+  if (!HAS_FB || !window.firebase){
+    mode="demo"; canWrite=true;
+    setSync("warn", HAS_FB ? "Offline · this device only" : "Demo · this device only");
+    if (!HAS_FB) banner("Demo mode: entries are saved on this device only. To share with the lab, connect the database as described in SETUP.md.");
+    return;
+  }
+  firebase.initializeApp(FBC);
+  auth = firebase.auth(); fdb = firebase.firestore();
+  try { await fdb.enablePersistence({synchronizeTabs:true}); } catch(e){}
+  mode = "firebase"; setSync("busy","Connecting…");
+  try { await auth.getRedirectResult(); } catch(e){ banner("Sign-in didn’t work: "+esc(e.message)); }
+  auth.onAuthStateChanged(onUser);
+}
+if ("serviceWorker" in navigator && location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
+boot();
+</script>
+</body>
+</html>
