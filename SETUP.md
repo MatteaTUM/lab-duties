@@ -69,11 +69,30 @@ Anyone who isn't on the list sees "this account isn't on the lab list yet", with
 - **Android (Chrome):** tap ⋮ → **Install app**.
 - **PC (Chrome/Edge):** click the install icon in the address bar.
 
+## 6. Daily order email (optional, free)
+
+Every weekday at about 18:00, a small Google Apps Script reads that day's checklist and emails the **responsible person of the month**. The email lists:
+- restock items marked **Order needed? yes** or ✗, with their location, min level and fill to,
+- daily checks marked ✗, with comments and readings.
+
+On days with nothing to order and no problems, no email is sent. Emails go out from the lab manager's Gmail. The email addresses are stored only in the script, never on GitHub.
+
+1. Go to **https://script.google.com**, signed in with the **same Google account as the Firebase project**, and click **New project**. Name it `Lab Duties email`.
+2. Delete the sample code in `Code.gs` and paste the contents of **`notify.gs`**.
+3. At the top, fill in `RESPONSIBLE` (an email per month) and `FALLBACK_EMAIL` (yours). Save with **Ctrl+S**.
+4. Click **⚙ Project Settings** (left) and tick **Show "appsscript.json" manifest file in editor**. Go back to the editor, open `appsscript.json`, replace its contents with **`appsscript.json`** from this folder, and save.
+5. Choose **`testNotification`** in the function dropdown at the top and click **Run**.
+   - Google asks for permission. Pick your account, click **Advanced → Go to Lab Duties email (unsafe)**, then **Allow**. The "unsafe" warning appears because it's your own unpublished script.
+   - The responsible person (or you) should get a test email within a minute.
+6. Choose **`installTrigger`** and click **Run** once. The email now goes out automatically every weekday evening.
+
+To change who gets the email (e.g. a new month), edit `RESPONSIBLE` in the script and save.
+
 ---
 
 ## How it works
 
-- **Picking a date:** use the Month / Day / Year dropdowns, or the ‹ › arrows. Tap the date line to jump to today.
+- **Picking a date:** the app always opens on today's date and moves on to the new day by itself, also when left open overnight or reopened from the background. To look at another day, use the Month / Day / Year dropdowns or the ‹ › arrows. Tap the date line to jump back to today.
 - **What is saved where:** daily checks and restock are saved per day. Weekly tasks, duty person and signature are saved per week. Inventory and material are saved per month. The yellow restock fields and added weekly tasks are shared settings.
 - **Who ticked it:** each tick shows the name of the person who made it.
 - **Live updates:** changes appear on everyone's phone within a second or two. Only the changed field is saved, so two people ticking at the same time never overwrite each other.

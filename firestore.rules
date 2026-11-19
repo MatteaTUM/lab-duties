@@ -25,9 +25,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // The checklist data
-    match /labs/{lab}/{document=**} {
-      allow read, write: if isMember();
+    // The checklist data (one document per day / week / month, plus "settings").
+    // Everyone on the list may write, except the yellow restock levels in "settings",
+    // which only the lab manager may change.
+    match /labs/{lab}/docs/{docId} {
+      allow read: if isMember();
+      allow write: if isMember() && (
+        docId != 'settings' || isAdmin() ||
+        !request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasAny(['restock'])
+      );
     }
   }
 }

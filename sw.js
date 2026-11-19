@@ -1,6 +1,6 @@
 // Offline support: keeps the app itself available without network.
 // Data goes to Firebase (never cached here); Firestore keeps unsaved changes on the device itself.
-const CACHE = "lab-duties-v4";
+const CACHE = "lab-duties-v6";
 const FB = "https://www.gstatic.com/firebasejs/10.12.2/";
 const SHELL = ["./", "index.html", "config.js", "manifest.webmanifest", "icon-192.png", "icon-512.png",
   FB + "firebase-app-compat.js", FB + "firebase-auth-compat.js", FB + "firebase-firestore-compat.js"];

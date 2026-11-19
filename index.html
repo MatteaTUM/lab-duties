@@ -68,6 +68,10 @@ nav.tabs button[aria-selected=true]{color:var(--accent);font-weight:600}
 
 main{padding-block:14px 24px}
 section.tab{display:none} section.tab.active{display:block}
+.subpane{display:none} .subpane.active{display:block}
+.subtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--na-soft);border-radius:12px;padding:4px;margin-bottom:12px}
+.subtabs button{border:0;background:none;border-radius:9px;min-height:40px;font-weight:600;color:var(--muted)}
+.subtabs button[aria-selected=true]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .banner{border:1px solid var(--warn);background:var(--weekend);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:13px}
 .banner button{margin-top:8px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
@@ -115,6 +119,7 @@ input:disabled{opacity:.6}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
 .yellow input{background:var(--yellow)}
+.fixed{background:var(--yellow);border-radius:10px;padding:9px 10px;min-height:42px;color:var(--ink);font-size:15px;overflow-wrap:anywhere}
 .seg{display:flex;gap:6px;margin-top:8px;align-items:center;font-size:13px;color:var(--muted)}
 .seg button{border:1px solid var(--line);background:var(--card);border-radius:10px;min-height:38px;padding:0 14px}
 .seg button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -196,38 +201,48 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
       <h2>Consumables restock</h2>
       <p class="note">Room 020 (and shared). Yellow fields = set once by lab manager. Min = reorder/refill trigger; Fill to = target stock at workplace.</p>
       <div class="progress"><span id="restockCount"></span><div class="meter"><i id="restockBar"></i></div></div>
+      <div class="btnrow"><button class="btn" id="btnLevels" aria-pressed="false">🔒 Edit levels (lab manager)</button></div>
     </div>
     <div id="restockList"></div>
   </section>
 
   <section class="tab" id="tab-weekly">
-    <div class="card">
-      <h2>Weekly routine</h2>
-      <p class="note">Checked off per week (<span id="weeklyLabel"></span>). Rooms without tasks in the spreadsheet are still empty. Add tasks below each room.</p>
+    <div class="subtabs" id="subtabs" role="tablist" aria-label="Weekly sections">
+      <button role="tab" data-sub="routine" aria-selected="true">Routine</button>
+      <button role="tab" data-sub="inventory" aria-selected="false">Inventory</button>
+      <button role="tab" data-sub="material" aria-selected="false">Produce</button>
     </div>
-    <div id="weeklyList"></div>
-  </section>
 
-  <section class="tab" id="tab-inventory">
-    <div class="card">
-      <h2>Inventory to check</h2>
-      <p class="note">Saved per month (<span id="invLabel"></span>). Tick once the item has been counted.</p>
-      <div class="progress"><span id="invCount"></span><div class="meter"><i id="invBar"></i></div></div>
+    <div class="subpane active" id="sub-routine">
+      <div class="card">
+        <h2>Weekly routine</h2>
+        <p class="note">Checked off per week (<span id="weeklyLabel"></span>). Rooms without tasks in the spreadsheet are still empty. Add tasks below each room.</p>
+      </div>
+      <div id="weeklyList"></div>
     </div>
-    <div class="filters">
-      <select id="invLoc" aria-label="Location"><option value="">All locations</option></select>
-      <label class="toggle"><input type="checkbox" id="invUnchecked"> only unchecked</label>
-      <input type="text" id="invSearch" class="full" placeholder="Search item, article nr., company…" aria-label="Search">
-    </div>
-    <div id="invList"></div>
-  </section>
 
-  <section class="tab" id="tab-material">
-    <div class="card">
-      <h2>Material to produce</h2>
-      <p class="note">Saved per month (<span id="matLabel"></span>). Tick when made and note amount / date / who.</p>
+    <div class="subpane" id="sub-inventory">
+      <div class="card">
+        <h2>Inventory to check</h2>
+        <p class="note">Checked off per week (<span id="invLabel"></span>). Tick once the item has been counted.</p>
+        <div class="progress"><span id="invCount"></span><div class="meter"><i id="invBar"></i></div></div>
+      </div>
+      <div class="filters">
+        <select id="invLoc" aria-label="Location"><option value="">All locations</option></select>
+        <label class="toggle"><input type="checkbox" id="invUnchecked"> only unchecked</label>
+        <input type="text" id="invSearch" class="full" placeholder="Search item, article nr., company…" aria-label="Search">
+      </div>
+      <div id="invList"></div>
     </div>
-    <div id="matList"></div>
+
+    <div class="subpane" id="sub-material">
+      <div class="card">
+        <h2>Material to produce</h2>
+        <p class="note">Checked off per week (<span id="matLabel"></span>). Tick when made and note amount / date / who.</p>
+        <div class="progress"><span id="matCount"></span><div class="meter"><i id="matBar"></i></div></div>
+      </div>
+      <div id="matList"></div>
+    </div>
   </section>
 
   <section class="tab" id="tab-schedule">
@@ -247,8 +262,6 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
   <button data-tab="daily" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Daily</button>
   <button data-tab="restock" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>Restock</button>
   <button data-tab="weekly" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Weekly</button>
-  <button data-tab="inventory" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Inventory</button>
-  <button data-tab="material" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4 19a1.5 1.5 0 0 0 1.3 2h13.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10"/></svg>Produce</button>
   <button data-tab="schedule" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2A5 5 0 0 1 21 19"/></svg>Who</button>
 </nav>
 
@@ -442,12 +455,19 @@ function patch(file, p){
   scheduleRender();
   if (mode!=="firebase"){ lsSet("lab-demo", cache); return; }
   // merge-write: only the changed fields are sent, so people ticking different items never overwrite each other
-  docRef(file).set(p, {merge:true}).catch(onWriteError);
+  docRef(file).set(p, {merge:true}).catch(e=>onWriteError(e, file, p));
 }
-function onWriteError(e){
-  if (e && e.code==="permission-denied") notMember();
+function onWriteError(e, file, p){
+  if (e && e.code==="permission-denied" && file===F.settings && p && p.restock){
+    // only the lab manager may change the yellow restock levels; the database puts the old value back
+    levelsUnlocked=false; levelsNote("Only the lab manager can change the restock levels.");
+    scheduleRender();
+  }
+  else if (e && e.code==="permission-denied") notMember();
   else setSync("warn","Not saved – check your connection");
 }
+let levelsUnlocked=false;
+function levelsNote(t){ banner(t ? esc(t) : ""); if (t) setTimeout(()=>banner(""), 5000); }
 const subs = {};
 function watch(slot, file){
   if (mode!=="firebase" || !fbUser) return;
@@ -464,7 +484,7 @@ function watch(slot, file){
   subs[slot] = {file, off};
 }
 function unwatchAll(){ Object.keys(subs).forEach(k=>{ subs[k].off(); delete subs[k]; }); }
-function resubscribe(){ watch("settings",F.settings); watch("day",F.day()); watch("week",F.week()); watch("month",F.month()); }
+function resubscribe(){ watch("settings",F.settings); watch("day",F.day()); watch("week",F.week()); }
 
 /* ================= Date selection ================= */
 const selY=$("selYear"), selM=$("selMonth"), selD=$("selDay");
@@ -516,8 +536,8 @@ document.addEventListener("focusout", ()=> setTimeout(()=>{ if (renderDeferred &
 
 function render(){
   if (editing()){ renderDeferred=true; return; }   // never redraw under someone's keyboard
-  const d=cur(), wd=d.getDay(), day=F.day(), week=F.week(), month=F.month(), set=F.settings;
-  const D=view(day), W=view(week), M=view(month), S=view(set);
+  const d=cur(), wd=d.getDay(), day=F.day(), week=F.week(), month=week, set=F.settings;   // inventory & material are kept per week
+  const D=view(day), W=view(week), M=W, S=view(set);
   const isToday = dkey(d)===dkey(new Date());
   $("dayPill").innerHTML = `<b>${WDL[wd]}, ${fmt(d)}</b>${isToday?" · today":" · tap to jump to today"}`;
   $("dayPill").classList.toggle("weekend", wd===0||wd===6);
@@ -549,11 +569,11 @@ function render(){
   $("restockList").innerHTML = RESTOCK.map((it,i)=>{
     const v=getIn(D,"restock."+i)||"", o=getIn(D,"order."+i)||""; if (v) rd++;
     return `<div class="item ${v==="✗"?"bad":v?"done":""}"><div class="ititle">${esc(it)}</div>
-      <div class="row3 yellow">
-        <label class="lbl">Location${txt(set,`restock.${i}.loc`,getIn(S,`restock.${i}.loc`))}</label>
-        <label class="lbl">Min level${txt(set,`restock.${i}.min`,getIn(S,`restock.${i}.min`))}</label>
-        <label class="lbl">Fill to${txt(set,`restock.${i}.fill`,getIn(S,`restock.${i}.fill`))}</label>
-      </div>
+      <div class="row3 yellow">${[["loc","Location"],["min","Min level"],["fill","Fill to"]].map(([k,l])=>{
+        const f=`restock.${i}.${k}`, v=getIn(S,f);
+        return levelsUnlocked ? `<label class="lbl">${l}${txt(set,f,v)}</label>`
+                              : `<div class="lbl">${l}<div class="fixed">${v?esc(v):"–"}</div></div>`;
+      }).join("")}</div>
       ${statusBtns(day,"restock."+i,v)}
       <div class="seg">Order needed?${["yes","no"].map(x=>`<button data-file="${day}" data-f="order.${i}" data-v="${x}" aria-pressed="${o===x}"${dis()}>${x}</button>`).join("")}</div>
       ${byLine(D,"restock."+i)}</div>`;
@@ -571,7 +591,7 @@ function render(){
   }).join("");
 
   // Inventory
-  $("invLabel").textContent = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  $("invLabel").textContent = "week of "+fmt(monday(d));
   const loc=$("invLoc").value, q=$("invSearch").value.toLowerCase(), only=$("invUnchecked").checked;
   let idone=0, lastLoc=null;
   const inv = INVENTORY.map((r,i)=>{
@@ -587,10 +607,11 @@ function render(){
       <label class="lbl">In order (amount, date)${txt(month,`inv.${i}.ord`,getIn(M,`inv.${i}.ord`))}</label></div></div>`;
   }).join("");
   $("invList").innerHTML = inv || `<div class="empty">No items match.</div>`;
-  meter("invCount","invBar",idone,INVENTORY.length,"checked this month");
+  meter("invCount","invBar",idone,INVENTORY.length,"checked this week");
 
   // Material
-  $("matLabel").textContent = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  $("matLabel").textContent = "week of "+fmt(monday(d));
+  meter("matCount","matBar",MATERIAL.filter((_,i)=>getIn(M,`mat.${i}.c`)).length,MATERIAL.length,"done this week");
   $("matList").innerHTML = MATERIAL.map((x,i)=>{ const c=getIn(M,`mat.${i}.c`);
     return `<div class="item ${c?"done":""}"><div class="checkrow">${cbox(month,`mat.${i}.c`,c,"Done "+x)}<div class="ititle">${esc(x)}${byLine(M,`mat.${i}.c`)}</div></div>
       <div class="extra">${txt(month,`mat.${i}.n`,getIn(M,`mat.${i}.n`),"Amount / date / by")}</div></div>`; }).join("");
@@ -599,7 +620,9 @@ function render(){
   $("schedMonth").tBodies[0].innerHTML = SCHEDULE.map(s=>`<tr class="${s.m===d.getMonth()?"current":""}"><td>${esc(s.label)}</td><td>${s.person?esc(s.person):'<span class="empty">not assigned</span>'}</td></tr>`).join("");
   $("schedHood").tBodies[0].innerHTML = HOODS.map(h=>`<tr><td>${esc(h[0])}</td><td>${esc(h[1])}</td></tr>`).join("");
 
-  ["allOk","clearDay"].forEach(id=>$(id).disabled=!canWrite);
+  ["allOk","clearDay","btnLevels"].forEach(id=>$(id).disabled=!canWrite);
+  $("btnLevels").textContent = levelsUnlocked ? "✓ Done editing levels" : "🔒 Edit levels (lab manager)";
+  $("btnLevels").setAttribute("aria-pressed", levelsUnlocked);
 }
 
 /* ================= Interaction ================= */
@@ -641,6 +664,7 @@ function addTask(ri){
 }
 document.addEventListener("keydown", e=>{ if (e.key==="Enter" && e.target.dataset && e.target.dataset.addfor!==undefined){ e.preventDefault(); addTask(+e.target.dataset.addfor); } });
 
+$("btnLevels").onclick = ()=>{ levelsUnlocked=!levelsUnlocked; render(); };
 $("allOk").onclick = ()=>{
   const day=F.day(), D=view(day), p={daily:{},by:{}};
   DAILY.forEach(r=>{ if(!r.g && !getIn(D,"daily."+r[0])){ p.daily[r[0]]="✓"; p.by["daily_"+r[0]]=who(); } });
@@ -676,7 +700,15 @@ $("tabs").addEventListener("click", e=>{
   document.querySelectorAll("section.tab").forEach(s=>s.classList.toggle("active", s.id==="tab-"+b.dataset.tab));
   window.scrollTo({top:0}); lsSet("lab-tab", b.dataset.tab);
 });
-{ const t=lsGet("lab-tab",null); const b=t && document.querySelector(`#tabs [data-tab="${t}"]`); if (b) b.click(); }
+{ let t=lsGet("lab-tab",null); if (t==="inventory"||t==="material"){ lsSet("lab-sub",t); t="weekly"; }
+  const b=t && document.querySelector(`#tabs [data-tab="${t}"]`); if (b) b.click(); }
+$("subtabs").addEventListener("click", e=>{
+  const b=e.target.closest("button[data-sub]"); if(!b) return;
+  document.querySelectorAll("#subtabs button").forEach(x=>x.setAttribute("aria-selected", x===b));
+  document.querySelectorAll(".subpane").forEach(p=>p.classList.toggle("active", p.id==="sub-"+b.dataset.sub));
+  window.scrollTo({top:0}); lsSet("lab-sub", b.dataset.sub);
+});
+{ const t=lsGet("lab-sub",null); const b=t && document.querySelector(`#subtabs [data-sub="${t}"]`); if (b) b.click(); }
 
 /* ================= Sign-in, members & settings ================= */
 const googleProvider = () => { const p=new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({prompt:"select_account"}); return p; };
@@ -693,6 +725,35 @@ function notMember(){
   $("bOut").onclick=()=>auth.signOut();
   setSync("warn","No access yet"); render();
 }
+// Inventory & material used to be saved per month. Copy anything entered that way into the
+// current week once, so it stays visible for the whole week (only fills in what the week doesn't have yet).
+function missingFrom(src, dst){
+  const out={}; let any=false;
+  for (const k in src){
+    const s=src[k], d=dst ? dst[k] : undefined;
+    if (s && typeof s==="object" && !Array.isArray(s)){ const sub=missingFrom(s, d && typeof d==="object" ? d : undefined); if (sub){ out[k]=sub; any=true; } }
+    else if (d===undefined || d===""){ if (s!=="" && s!==false && s!=null){ out[k]=s; any=true; } }
+  }
+  return any ? out : null;
+}
+async function carryMonthIntoWeek(){
+  if (mode!=="firebase") return;
+  const t=new Date(), weekFile="week-"+dkey(monday(t));
+  const months=[...new Set([monday(t), t].map(x=>`month-${x.getFullYear()}-${pad(x.getMonth()+1)}`))];
+  const w=await docRef(weekFile).get(); const W=w.exists ? w.data() : {};
+  if (W.carriedFromMonth) return;
+  const p={carriedFromMonth:true};
+  for (const mf of months){
+    const m=await docRef(mf).get(); if (!m.exists) continue;
+    const M=m.data(), src={};
+    if (M.inv) src.inv=M.inv;
+    if (M.mat) src.mat=M.mat;
+    if (M.by){ const by={}; for (const k in M.by) if (/^(inv|mat)_/.test(k)) by[k]=M.by[k]; if (Object.keys(by).length) src.by=by; }
+    const add=missingFrom(src, W); if (add) merge(p, add);
+  }
+  patch(weekFile, p);
+}
+
 async function onUser(u){
   fbUser=u; unwatchAll(); Object.keys(cache).forEach(k=>delete cache[k]);
   if (!u){
@@ -704,6 +765,7 @@ async function onUser(u){
   try { await docRef(F.settings).get(); }
   catch(e){ if (e.code==="permission-denied"){ notMember(); return; } }   // offline errors: carry on with the saved copy
   canWrite=true; banner(""); resubscribe(); render();
+  carryMonthIntoWeek().catch(()=>{});
 }
 
 let membersOff=null;
@@ -755,6 +817,18 @@ async function boot(){
   try { await auth.getRedirectResult(); } catch(e){ banner("Sign-in didn’t work: "+esc(e.message)); }
   auth.onAuthStateChanged(onUser);
 }
+/* Follow the calendar: when a new day starts (app left open overnight, or reopened from the
+   background on another day), jump to today. Within the same day, a date you picked stays. */
+let lastDay = dkey(new Date());
+function syncToday(){
+  const t = new Date();
+  if (dkey(t) !== lastDay){ lastDay = dkey(t); setDate(t); }
+}
+setInterval(syncToday, 60000);
+document.addEventListener("visibilitychange", ()=>{ if (!document.hidden) syncToday(); });
+window.addEventListener("pageshow", syncToday);
+window.addEventListener("focus", syncToday);
+
 if ("serviceWorker" in navigator && location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
 boot();
 </script>
